@@ -1,1 +1,31 @@
-sdadsa
+[root@CG-SIT-Front ~]# cat /etc/filebeat/filebeat.yml
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /var/log/tomcat/catalina.out
+  document_type: "catalina_log"
+  multiline:
+    pattern: '^(Jan|JAN|Feb|FEB|Mar|MAR|Apr|APR|May|MAY|Jun|JUN|Jul|JUL|Aug|AUG|Sep|SEP|Oct|OCT|Nov|NOV|Dec|DEC)[\s{1}|\/|-]\d{2,}'
+    negate: true
+    match: after
+    max_lines: 1000
+    timeout: 30s
+  fields:
+    logsource: SIT_S03_S04_S05_S07
+    logtype: catalina_out
+- input_type: log
+  paths:
+    - /var/log/nginx/access.log
+  document_type: "nginx_log"
+  fields:
+    logsource: CG_Front_Nginx
+    logtype: nginx_log
+- input_type: log
+  paths:
+    - /var/log/nginx/access.log-20190314
+  document_type: "nginx_error_log"
+  fields:
+    logsource:  SIT_Nginx_S03_S04_S05_S07
+    logtype: nginx_error_log
+output.logstash:
+  hosts: ["192.168.168.42:5044"]
